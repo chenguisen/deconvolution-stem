@@ -46,7 +46,7 @@ try:
     from stem_deconv.utils import read_mrc, write_mrc
     from stem_deconv.physics import calculate_ctf, calculate_probe, calculate_wavelength
     from stem_deconv.core import richardson_lucy_additive, richardson_lucy_multiplicative, fista_deconvolution
-    from stem_deconv.postprocess import radial_wiener_filter, p_spline_wiener_filter
+    from stem_deconv.postprocess import radial_wiener_filter, p_spline_wiener_filter, radial_difference_filter
 except ImportError as e:
     print(f"Warning: Could not import stem_deconv modules: {e}")
     print("Please ensure stem_deconv package is available in the current directory.")
@@ -147,6 +147,12 @@ class DeconvolutionWorker(QThread):
                 if self.params['apply_wiener']:
                     self.progress.emit("Applying radial Wiener filter...")
                     self.results['result'] = radial_wiener_filter(
+                        np.abs(self.results['result']), pixel_size,
+                        information_limit=self.params['information_limit']
+                    )
+                if self.params['use_radial_diff']:
+                    self.progress.emit("Applying radial difference filter...")
+                    self.results['result'] = radial_difference_filter(
                         np.abs(self.results['result']), pixel_size,
                         information_limit=self.params['information_limit']
                     )
@@ -722,6 +728,11 @@ class DeconvolutionGUI(QMainWindow):
         self.use_p_spline_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
         post_layout.addWidget(self.use_p_spline_check)
 
+        self.use_radial_diff_check = QCheckBox("Use Radial Difference Filter")
+        self.use_radial_diff_check.setChecked(False)
+        self.use_radial_diff_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
+        post_layout.addWidget(self.use_radial_diff_check)
+
         post_param_layout = QGridLayout()
         
         post_param_layout.addWidget(QLabel("P-spline Lambda:"), 0, 0)
@@ -873,7 +884,7 @@ class DeconvolutionGUI(QMainWindow):
             # Update checkboxes with theme-appropriate colors
             checkbox_color = theme_checkbox_colors[theme_name]
             checkbox_style = f"QCheckBox {{ color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; }} QCheckBox::indicator {{ width: 18px; height: 18px; border: 2px solid {checkbox_color}; border-radius: 4px; background: #2c3e50; }} QCheckBox::indicator:checked {{ background: {checkbox_color}; border-color: {checkbox_color}; }}"
-            for checkbox in [self.boundary_handling_check, self.acceleration_check, self.entropy_stopping_check, self.sharpness_stopping_check, self.residual_stopping_check, self.apply_wiener_check, self.use_p_spline_check]:
+            for checkbox in [self.boundary_handling_check, self.acceleration_check, self.entropy_stopping_check, self.sharpness_stopping_check, self.residual_stopping_check, self.apply_wiener_check, self.use_p_spline_check, self.use_radial_diff_check]:
                 checkbox.setStyleSheet(checkbox_style)
             
     def get_professional_blue_theme(self):
@@ -2147,6 +2158,7 @@ class DeconvolutionGUI(QMainWindow):
             'residual_stopping': self.residual_stopping_check.isChecked(),
             'apply_wiener': self.apply_wiener_check.isChecked(),
             'use_p_spline': self.use_p_spline_check.isChecked(),
+            'use_radial_diff': self.use_radial_diff_check.isChecked(),
             'p_spline_lambda': self.p_spline_lambda_spin.value(),
             'information_limit': self.info_limit_spin.value() if self.info_limit_spin.value() > 0.1 else None,
             'damping_threshold': None  # Could add this to UI if needed

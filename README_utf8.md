@@ -33,6 +33,10 @@
   - 径向维纳滤波 (Radial Wiener Filter)
   - P-样条滤波 (P-spline Filter) - 用于复杂背景估计
   - 径向差分滤波 (Radial Difference Filter)
+- 🎛️ **自动停止准则** (RL Multiplicative, GUI 可配置)
+  - 残差型停止 (Residual-based) - 检测信号提取→噪声拟合转变
+  - 熵平台检测 (Entropy Plateau) - 监测信息熵变化趋于平稳
+  - 锐度最小检测 (Sharpness Minimum) - 检测锐度 U 型曲线最小值
 - 📁 **MRC 文件格式支持**
 
 ## 系统要求
@@ -100,11 +104,12 @@ python deconvolution_gui.py
    - Richardson-Lucy Additive：适合大多数情况
    - Richardson-Lucy Multiplicative：适合强度变化较大的图像
    - FISTA：适合需要稀疏约束的场景
-5. **调整参数** - 设置迭代次数、正则化参数等
-6. **预览探针** - 点击 "Preview Probe" 查看生成的探针函数
-7. **开始处理** - 点击 "Start Processing" 执行解卷积
-8. **查看结果** - 在三个标签页中查看探针、原始数据和结果
-9. **保存结果** - 点击 "Save Results" 保存解卷积图像
+5. **调整参数** - 设置迭代次数、正则化参数、停止准则、边界处理等高级选项
+6. **选择后处理** - 可叠加使用 Wiener / P-spline / 径向差分滤波
+7. **预览探针** - 点击 "Preview Probe" 查看生成的探针函数
+8. **开始处理** - 点击 "Start Processing" 执行解卷积
+9. **查看结果** - 在三个标签页中查看探针、原始数据和结果
+10. **保存结果** - 点击 "Save Results" 保存解卷积图像
 
 #### 主题切换
 
