@@ -216,6 +216,8 @@ dec_stem_for_computer/
 ├── config_manager.py         # 配置管理
 ├── session_logger.py         # 会话日志记录
 ├── requirements.txt          # 依赖包列表
+├── tests/                   # 测试
+│   └── test_pipeline.py     # Pipeline 集成测试
 ├── testdata/                # 测试数据
 ├── stem_deconv/             # 核心算法库
 │   ├── core.py              # 解卷积算法 (RL, RL-TV, FISTA-TV)

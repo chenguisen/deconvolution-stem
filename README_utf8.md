@@ -205,6 +205,8 @@ dec_stem_for_computer/
 ├── run_deconv.py            # 命令行工具
 ├── compare_results.py        # 结果对比工具
 ├── requirements.txt          # 依赖包列表
+├── tests/                   # 测试
+│   └── test_pipeline.py     # Pipeline 集成测试
 ├── .gitignore             # Git 忽略文件
 ├── stem_deconv/           # 核心解卷积模块
 │   ├── __init__.py
