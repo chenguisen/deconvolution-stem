@@ -119,7 +119,10 @@ class DeconvolutionWorker(QThread):
                     acceleration=self.params['acceleration'],
                     boundary_handling=self.params['boundary_handling'],
                     damping_threshold=self.params['damping_threshold'],
-                    background_level=bg_level
+                    background_level=bg_level,
+                    entropy_stopping=self.params['entropy_stopping'],
+                    sharpness_stopping=self.params['sharpness_stopping'],
+                    residual_stopping=self.params['residual_stopping']
                 )
                 self.results['result'] = result
             elif algorithm_id == 2:  # FISTA
@@ -133,17 +136,18 @@ class DeconvolutionWorker(QThread):
                 self.results['result'] = result
             
             # Apply post-processing to result
-            if self.params['apply_wiener'] and 'result' in self.results:
-                self.progress.emit("Applying post-processing...")
+            if 'result' in self.results:
                 if self.params['use_p_spline']:
+                    self.progress.emit("Applying P-spline filter...")
                     self.results['result'] = p_spline_wiener_filter(
-                        np.abs(self.results['result']), pixel_size, 
+                        np.abs(self.results['result']), pixel_size,
                         lambda_val=self.params['p_spline_lambda'],
                         information_limit=self.params['information_limit']
                     )
-                else:
+                if self.params['apply_wiener']:
+                    self.progress.emit("Applying radial Wiener filter...")
                     self.results['result'] = radial_wiener_filter(
-                        np.abs(self.results['result']), pixel_size, 
+                        np.abs(self.results['result']), pixel_size,
                         information_limit=self.params['information_limit']
                     )
             
@@ -685,6 +689,22 @@ class DeconvolutionGUI(QMainWindow):
         self.acceleration_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
         advanced_layout.addWidget(self.acceleration_check)
 
+        # Stopping criteria
+        self.entropy_stopping_check = QCheckBox("Entropy Plateau Stopping")
+        self.entropy_stopping_check.setChecked(False)
+        self.entropy_stopping_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
+        advanced_layout.addWidget(self.entropy_stopping_check)
+
+        self.sharpness_stopping_check = QCheckBox("Sharpness Minimum Stopping")
+        self.sharpness_stopping_check.setChecked(False)
+        self.sharpness_stopping_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
+        advanced_layout.addWidget(self.sharpness_stopping_check)
+
+        self.residual_stopping_check = QCheckBox("Residual-based Stopping")
+        self.residual_stopping_check.setChecked(True)
+        self.residual_stopping_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
+        advanced_layout.addWidget(self.residual_stopping_check)
+
         advanced_group.setLayout(advanced_layout)
         scroll_layout.addWidget(advanced_group)
         
@@ -853,7 +873,7 @@ class DeconvolutionGUI(QMainWindow):
             # Update checkboxes with theme-appropriate colors
             checkbox_color = theme_checkbox_colors[theme_name]
             checkbox_style = f"QCheckBox {{ color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; }} QCheckBox::indicator {{ width: 18px; height: 18px; border: 2px solid {checkbox_color}; border-radius: 4px; background: #2c3e50; }} QCheckBox::indicator:checked {{ background: {checkbox_color}; border-color: {checkbox_color}; }}"
-            for checkbox in [self.boundary_handling_check, self.acceleration_check, self.apply_wiener_check, self.use_p_spline_check]:
+            for checkbox in [self.boundary_handling_check, self.acceleration_check, self.entropy_stopping_check, self.sharpness_stopping_check, self.residual_stopping_check, self.apply_wiener_check, self.use_p_spline_check]:
                 checkbox.setStyleSheet(checkbox_style)
             
     def get_professional_blue_theme(self):
@@ -2122,6 +2142,9 @@ class DeconvolutionGUI(QMainWindow):
             'reg_type': self.reg_type_combo.currentText(),
             'boundary_handling': self.boundary_handling_check.isChecked(),
             'acceleration': self.acceleration_check.isChecked(),
+            'entropy_stopping': self.entropy_stopping_check.isChecked(),
+            'sharpness_stopping': self.sharpness_stopping_check.isChecked(),
+            'residual_stopping': self.residual_stopping_check.isChecked(),
             'apply_wiener': self.apply_wiener_check.isChecked(),
             'use_p_spline': self.use_p_spline_check.isChecked(),
             'p_spline_lambda': self.p_spline_lambda_spin.value(),

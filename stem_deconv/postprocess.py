@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.fftpack import dct, idct
+from scipy.fft import dct, idct
 from .utils import fft2, ifft2, fftshift, ifftshift
 
 def whittaker_smooth_2d(data, lambda_val, order=2):
@@ -25,29 +25,6 @@ def whittaker_smooth_2d(data, lambda_val, order=2):
     # 4. Inverse DCT
     z = idct(idct(Z, axis=0, norm='ortho', type=2), axis=1, norm='ortho', type=2)
     
-    return z
-
-def whittaker_smooth_2d_iterative(data, lambda_val, order=2, max_iter=10, tol=1e-3):
-    """
-    Iterative 2D Whittaker smoother for background estimation (Asymmetric / Robust).
-    """
-    z = data.copy()
-    w_data = data.copy()
-    
-    for it in range(max_iter):
-        z_prev = z.copy()
-        
-        # 1. Smooth the current working data
-        z = whittaker_smooth_2d(w_data, lambda_val, order=order)
-        
-        # 2. Update working data: Clip peaks
-        w_data = np.minimum(data, z)
-        
-        # Check convergence
-        diff = np.linalg.norm(z - z_prev) / (np.linalg.norm(z_prev) + 1e-10)
-        if diff < tol:
-            break
-            
     return z
 
 def get_gaussian_kernel_1d_from_2d(kernel_size, sigma):
@@ -324,31 +301,6 @@ def p_spline_wiener_filter(image, pixel_size, lambda_val=100.0, order=2, informa
     filtered_fft = img_fft_shifted * wiener_filter
     
     # 8. IFFT
-    filtered_image = np.abs(ifft2(ifftshift(filtered_fft)))
-    
-    return filtered_image
-    background_power = background_mag**2
-    
-    # Mask center of background (preserve low freq)
-    cy, cx = rows//2, cols//2
-    shift = 2
-    background_power[cy-shift:cy+2, cx-shift:cx+2] = 0
-    
-    # 5. Construct Filter
-    # W = (P - B) / P
-    wiener_filter = np.zeros_like(power_spectrum)
-    
-    with np.errstate(divide='ignore', invalid='ignore'):
-        numerator = power_spectrum - background_power
-        numerator[numerator < 0] = 0
-        
-        wiener_filter = numerator / power_spectrum
-        wiener_filter[power_spectrum == 0] = 0
-        
-    # 6. Apply Filter
-    filtered_fft = img_fft_shifted * wiener_filter
-    
-    # 7. IFFT
     filtered_image = np.abs(ifft2(ifftshift(filtered_fft)))
     
     return filtered_image
