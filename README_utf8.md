@@ -1,6 +1,6 @@
 # HAADF-STEM Image Deconvolution
 
-[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 一个用于 HAADF-STEM (High-Angle Annular Dark-Field Scanning Transmission Electron Microscopy) 图像解卷积的 Python 工具包，提供完整的图形界面和命令行工具。
@@ -37,7 +37,7 @@
 
 ## 系统要求
 
-- Python 3.9 或更高版本
+- Python 3.8 或更高版本
 - 操作系统：Linux, macOS, Windows
 
 ## 安装
@@ -98,9 +98,9 @@ python deconvolution_gui.py
 3. **配置显微镜参数** - 根据您的设备设置电压、球差、离焦等参数
 4. **选择算法** - 选择一种解卷积算法：
    - Richardson-Lucy Additive：适合大多数情况
-   - Richardson-Lucy Multiplicative：适合强度变化较大的图像，支持加速和阻尼
-   - FISTA：适合需要稀疏约束和TV正则化的场景
-5. **调整参数** - 设置迭代次数、正则化参数、边界处理等高级选项
+   - Richardson-Lucy Multiplicative：适合强度变化较大的图像
+   - FISTA：适合需要稀疏约束的场景
+5. **调整参数** - 设置迭代次数、正则化参数等
 6. **预览探针** - 点击 "Preview Probe" 查看生成的探针函数
 7. **开始处理** - 点击 "Start Processing" 执行解卷积
 8. **查看结果** - 在三个标签页中查看探针、原始数据和结果
@@ -108,7 +108,7 @@ python deconvolution_gui.py
 
 #### 主题切换
 
-通过菜单栏 `🎨 Theme` 切换不同的界面主题。
+通过菜单栏 `? Theme` 切换不同的界面主题。
 
 #### 显示控制
 
@@ -162,43 +162,35 @@ python compare_results.py
 
 ### Richardson-Lucy Multiplicative
 
-基于乘法模型的 RL 算法，带有 TV 正则化和自动化停止准则，适合强度变化较大的图像。
+基于乘法模型的 RL 算法，适合强度变化较大的图像。
 
 **特点**：
-- TV 正则化（空间自适应边缘保持）
-- 乘法约束，自然保持非负性
-- Biggs-Andrews 向量外推加速（数据依赖步长，0-1 钳位）
-- 阻尼(Damping)控制以抑制平坦区域的噪声放大
-- 三种自动化停止准则：残差型、熵平台检测、锐度最小检测
-- 停止时自动回滚到最佳迭代结果
+- 乘法约束
+- 适合高对比度图像
+- 包含加速选项
 
 ### FISTA
 
-快速迭代收缩阈值算法，结合全变分(TV)正则化和 Chambolle 投影近端算子。
+快速迭代收缩阈值算法，适合需要稀疏约束的场景。
 
 **特点**：
-- Nesterov 加速（动量外推）
-- Chambolle 对偶投影算法实现 TV 近端算子
-- 强大的保边去噪能力 (TV正则化)
-- 适合极低信噪比及高斯噪声主导的图像
+- 收敛速度快
+- L1 正则化
+- 适合稀疏数据
 
 ## 后处理
 
-### 径向维纳滤波 (Radial Wiener Filter)
+### 维纳滤波 (Wiener Filter)
 
 用于抑制高频噪声，提高信噪比。
 
 ### P-样条滤波 (P-spline Filter)
 
-基于 P-样条的高级滤波方法，提供更好的复杂背景估计和频率响应控制。
+基于 P-样条的高级滤波方法，提供更好的频率响应控制。
 
 **参数**：
 - `P-spline Lambda`: 样条平滑参数
 - `Information Limit`: 信息截止频率（可自动估计）
-
-### 径向差分滤波 (Radial Difference Filter)
-
-通过减去径向平均背景来增强结构信息。
 
 ## 文件结构
 
@@ -207,23 +199,21 @@ dec_stem_for_computer/
 ├── deconvolution_gui.py      # GUI 主程序
 ├── run_deconv.py            # 命令行工具
 ├── compare_results.py        # 结果对比工具
-├── test_damping.py           # 阻尼参数测试
-├── config_manager.py         # 配置管理
-├── session_logger.py         # 会话日志记录
 ├── requirements.txt          # 依赖包列表
-├── testdata/                # 测试数据
-├── stem_deconv/             # 核心算法库
-│   ├── core.py              # 解卷积算法 (RL, RL-TV, FISTA-TV)
-│   ├── physics.py           # 电子光学与探针计算 (CTF)
-│   ├── postprocess.py       # 滤波与后处理 (Wiener, P-spline)
-│   ├── regularization.py    # 正则化方法 (TV, Tikhonov-Miller)
-│   ├── io.py                # MRC/DM3 文件读写
-│   ├── display.py           # 图像显示与频谱可视化
-│   ├── metrics.py           # 定量评估 (SNR, SSIM, MSE, FRC)
-│   └── utils.py             # FFT 工具函数
+├── .gitignore             # Git 忽略文件
+├── stem_deconv/           # 核心解卷积模块
+│   ├── __init__.py
+│   ├── core.py           # 解卷积算法
+│   ├── physics.py        # 物理模型（CTF、探针）
+│   ├── postprocess.py    # 后处理（维纳滤波）
+│   ├── io.py            # MRC 文件读写
+│   ├── utils.py         # 工具函数
+│   ├── display.py       # 可视化函数
+│   └── regularization.py # 正则化方法
+└── README.md             # 说明文档
 ```
 
-## 常见问题 (FAQ)
+## 常见问题
 
 ### Q: 如何获取显微镜参数？
 
@@ -254,22 +244,11 @@ MIT License
 如有问题或建议，请通过以下方式联系：
 - GitHub Issues: https://github.com/chenguisen/dec_stem_for_computer/issues
 
+## 致谢
+
+本项目基于 HAADF-STEM 图像解卷积理论开发，感谢相关研究人员的贡献。
+
 ## 更新日志
-
-### v1.2.0 (2026-05)
-- 增强 Biggs-Andrews 向量外推加速（数据依赖步长）
-- 实现 Chambolle 投影算法用于 FISTA-TV 近端算子
-- 新增三种自动化停止准则：残差、熵平台、锐度最小检测
-- 新增 `metrics.py` 模块（SNR, SSIM, MSE, FRC 定量评估）
-- FFT 零填充默认策略更新为 2 的幂次
-- 更新依赖版本：Python 3.9+, PyQt6, scikit-image 0.19+
-- 代码与 CPC 期刊论文描述对齐
-
-### v1.1.0 (2026-02)
-- 增加 FISTA 算法与 TV 正则化
-- 增加 RL 乘法算法的 Biggs-Andrews 加速与阻尼控制
-- 增加 P-样条滤波和径向差分滤波
-- 优化 GUI 界面与高级参数设置
 
 ### v1.0.0 (2025-12-25)
 - 初始版本发布
