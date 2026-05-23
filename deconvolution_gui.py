@@ -2288,12 +2288,10 @@ class DeconvolutionGUI(QMainWindow):
             QMessageBox.information(self, "No Filter", "No post-processing filter selected. Please check at least one filter.")
             return
 
-        # Store and display
-        if target == "Deconvolution Result":
-            self.results['result'] = image
-        else:
-            self.results['original'] = image
+        # Always show filtered output in the Result panel
+        self.results['result'] = image
         self.display_results()
+        self.display_tabs.setCurrentIndex(2)  # Switch to Result tab
         self.status_text.append("Filter(s) applied successfully.")
 
     def display_results(self):
