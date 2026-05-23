@@ -723,12 +723,12 @@ class DeconvolutionGUI(QMainWindow):
         self.apply_wiener_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
         post_layout.addWidget(self.apply_wiener_check)
 
-        self.use_p_spline_check = QCheckBox("Use P-spline Filter")
+        self.use_p_spline_check = QCheckBox("Apply P-spline Filter")
         self.use_p_spline_check.setChecked(False)
         self.use_p_spline_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
         post_layout.addWidget(self.use_p_spline_check)
 
-        self.use_radial_diff_check = QCheckBox("Use Radial Difference Filter")
+        self.use_radial_diff_check = QCheckBox("Apply Radial Difference Filter")
         self.use_radial_diff_check.setChecked(False)
         self.use_radial_diff_check.setStyleSheet("QCheckBox { color: #ffffff; font-size: 11pt; font-weight: bold; padding: 3px; } QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #4361ee; border-radius: 4px; background: #2c3e50; } QCheckBox::indicator:checked { background: #4361ee; border-color: #4361ee; }")
         post_layout.addWidget(self.use_radial_diff_check)
@@ -749,6 +749,36 @@ class DeconvolutionGUI(QMainWindow):
         post_param_layout.addWidget(self.info_limit_spin, 1, 1)
         
         post_layout.addLayout(post_param_layout)
+
+        # Filter target & apply button
+        filter_action_layout = QHBoxLayout()
+        filter_action_layout.addWidget(QLabel("Target:"))
+        self.filter_target_combo = QComboBox()
+        self.filter_target_combo.addItems(["Deconvolution Result", "Original Image"])
+        self.filter_target_combo.setStyleSheet("QComboBox { color: #ffffff; background: rgba(44, 62, 80, 0.7); border: 1px solid #4361ee; border-radius: 4px; padding: 4px; } QComboBox::drop-down { border: none; } QComboBox QAbstractItemView { color: #ffffff; background: #2c3e50; selection-background-color: #4361ee; }")
+        filter_action_layout.addWidget(self.filter_target_combo)
+        self.apply_filters_btn = QPushButton("Apply Filters")
+        self.apply_filters_btn.clicked.connect(self.apply_post_filters_manually)
+        self.apply_filters_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #4361ee, stop:1 #3a56d4);
+                color: white;
+                font-weight: bold;
+                padding: 6px 12px;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #4cc9f0, stop:1 #4361ee);
+            }
+            QPushButton:disabled {
+                background: #555555;
+            }
+        """)
+        filter_action_layout.addWidget(self.apply_filters_btn)
+        post_layout.addLayout(filter_action_layout)
+
         post_group.setLayout(post_layout)
         scroll_layout.addWidget(post_group)
         
@@ -2213,7 +2243,59 @@ class DeconvolutionGUI(QMainWindow):
         self.status_text.append(f"Error: {error_message}")
         QMessageBox.critical(self, "Processing Error", error_message)
         self.process_btn.setEnabled(True)
-        
+
+    def apply_post_filters_manually(self):
+        """手动对选定目标应用后处理滤波"""
+        if not self.results:
+            QMessageBox.warning(self, "No Data", "Please load an image or run deconvolution first.")
+            return
+
+        target = self.filter_target_combo.currentText()
+        if target == "Deconvolution Result":
+            if 'result' not in self.results:
+                QMessageBox.warning(self, "No Result", "No deconvolution result available. Run deconvolution first or select 'Original Image' as target.")
+                return
+            image = np.abs(self.results['result'])
+        else:
+            if 'original' not in self.results:
+                QMessageBox.warning(self, "No Data", "No original image loaded.")
+                return
+            image = self.results['original'].copy()
+
+        pixel_size = self.results.get('pixel_size', 0.1)
+        info_limit = self.info_limit_spin.value() if self.info_limit_spin.value() > 0.1 else None
+
+        # Apply filters in order: P-spline → Wiener → Radial Diff
+        any_applied = False
+        if self.use_p_spline_check.isChecked():
+            self.status_text.append("Applying P-spline filter...")
+            image = p_spline_wiener_filter(image, pixel_size,
+                lambda_val=self.p_spline_lambda_spin.value(),
+                information_limit=info_limit)
+            any_applied = True
+        if self.apply_wiener_check.isChecked():
+            self.status_text.append("Applying radial Wiener filter...")
+            image = radial_wiener_filter(image, pixel_size,
+                information_limit=info_limit)
+            any_applied = True
+        if self.use_radial_diff_check.isChecked():
+            self.status_text.append("Applying radial difference filter...")
+            image = radial_difference_filter(image, pixel_size,
+                information_limit=info_limit)
+            any_applied = True
+
+        if not any_applied:
+            QMessageBox.information(self, "No Filter", "No post-processing filter selected. Please check at least one filter.")
+            return
+
+        # Store and display
+        if target == "Deconvolution Result":
+            self.results['result'] = image
+        else:
+            self.results['original'] = image
+        self.display_results()
+        self.status_text.append("Filter(s) applied successfully.")
+
     def display_results(self):
         """显示结果"""
         if not self.results:
