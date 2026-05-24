@@ -1,6 +1,6 @@
 # HAADF-STEM Image Deconvolution
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-Academic%20Use-blue.svg)](LICENSE)
 
 一个用于 HAADF-STEM (High-Angle Annular Dark-Field Scanning Transmission Electron Microscopy) 图像解卷积的 Python 工具包，提供完整的图形界面和命令行工具。
@@ -41,7 +41,7 @@
 
 ## 系统要求
 
-- Python 3.8 或更高版本
+- Python 3.9 或更高版本
 - 操作系统：Linux, macOS, Windows
 
 ## 安装

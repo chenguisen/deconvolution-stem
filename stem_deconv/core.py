@@ -153,7 +153,7 @@ def _compute_hp_residual_norm(image, blurred_with_bg, sigma=3.0):
     return float(np.linalg.norm(residual_high))
 
 
-def richardson_lucy_multiplicative(image, probe, iterations, lambda_reg=0, reg_type="None", pixel_size=1.0, wavelength=1.0, acceleration=False, boundary_handling=True, damping_threshold=None, background_level=0.0, entropy_stopping=False, entropy_window=5, entropy_patience=3, entropy_rel_tol=5e-3, entropy_grad_tol=None, entropy_min_iterations=10, sharpness_stopping=False, sharpness_patience=2, sharpness_rel_tol=0.005, sharpness_min_iterations=10, residual_stopping=False, residual_sigma=3.0, residual_rel_tol=0.85, residual_patience=3, residual_min_iterations=5, return_info=False):
+def richardson_lucy_multiplicative(image, probe, iterations, lambda_reg=0, reg_type="None", pixel_size=1.0, wavelength=1.0, acceleration=False, boundary_handling=True, damping_threshold=None, background_level=0.0, entropy_stopping=False, entropy_window=5, entropy_patience=3, entropy_rel_tol=5e-3, entropy_grad_tol=None, entropy_min_iterations=10, sharpness_stopping=False, sharpness_patience=2, sharpness_rel_tol=0.005, sharpness_min_iterations=10, residual_stopping=False, residual_sigma=3.0, residual_rel_tol=0.6, residual_patience=3, residual_min_iterations=5, return_info=False):
     """
     Richardson-Lucy Multiplicative Deconvolution.
     Supports Biggs-Andrews acceleration, Damping, and Background handling.

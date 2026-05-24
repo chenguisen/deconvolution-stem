@@ -658,17 +658,17 @@ class DeconvolutionGUI(QMainWindow):
         
         deconv_layout.addWidget(QLabel("Lambda (RL):"), 1, 0)
         self.lambda_spin = QDoubleSpinBox()
+        self.lambda_spin.setDecimals(4)
         self.lambda_spin.setRange(0.0001, 1.0)
         self.lambda_spin.setValue(0.002)
-        self.lambda_spin.setDecimals(4)
         self.lambda_spin.setSingleStep(0.0001)
         deconv_layout.addWidget(self.lambda_spin, 1, 1)
         
         deconv_layout.addWidget(QLabel("Lambda (FISTA):"), 2, 0)
         self.fista_lambda_spin = QDoubleSpinBox()
+        self.fista_lambda_spin.setDecimals(4)
         self.fista_lambda_spin.setRange(0.0001, 1.0)
         self.fista_lambda_spin.setValue(0.005)
-        self.fista_lambda_spin.setDecimals(4)
         self.fista_lambda_spin.setSingleStep(0.0001)
         deconv_layout.addWidget(self.fista_lambda_spin, 2, 1)
         
