@@ -488,7 +488,7 @@ observer.start()
 - **配置指南**: [CONFIG.md](CONFIG.md)
 - **安装指南**: [INSTALL.md](INSTALL.md)
 - **打包指南**: [PACKAGING_WINDOWS.md](PACKAGING_WINDOWS.md)
-- **GitHub Issues**: [提交问题](https://github.com/chenguisen/dec_stem_for_computer/issues)
+- **GitHub Issues**: [提交问题](https://github.com/chenguisen/deconvolution-stem/issues)
 
 ---
 

@@ -1,323 +1,324 @@
-# 配置说明 (Configuration Guide)
+# Configuration Guide
 
-本文档详细说明 HAADF-STEM 解卷积工具的各项参数配置。
+This document details the parameter configuration for the HAADF-STEM Deconvolution toolkit.
 
-## 目录
+## Table of Contents
 
-- [显微镜参数](#显微镜参数)
-- [解卷积参数](#解卷积参数)
-- [高级像差参数](#高级像差参数)
-- [后处理参数](#后处理参数)
-- [显示参数](#显示参数)
-- [参数推荐值](#参数推荐值)
+- [Microscope Parameters](#microscope-parameters)
+- [Deconvolution Parameters](#deconvolution-parameters)
+- [Advanced Aberration Parameters](#advanced-aberration-parameters)
+- [Post-Processing Parameters](#post-processing-parameters)
+- [Display Parameters](#display-parameters)
+- [Recommended Parameter Values](#recommended-parameter-values)
+- [Parameter Tuning Strategy](#parameter-tuning-strategy)
+- [Troubleshooting](#troubleshooting)
 
-## 显微镜参数
+## Microscope Parameters
 
-### Voltage (电压)
+### Voltage
 
-**单位**: kV (千伏)
+**Unit**: kV
 
-**说明**: 电子显微镜的加速电压。
+**Description**: Accelerating voltage of the electron microscope.
 
-**常见值**:
-- 80 kV: 适用于低电压 TEM
-- 200 kV: 常规 TEM 标准
-- 300 kV: 高分辨率 TEM（最常用）
-- 1000 kV: 超高压 TEM
+**Common values**:
+- 80 kV: Suitable for low-voltage TEM
+- 200 kV: Standard TEM
+- 300 kV: High-resolution TEM (most common)
+- 1000 kV: Ultra-high voltage TEM
 
-**影响**: 电压越高，电子波长越短，分辨率越高，但样品损伤可能增加。
+**Effect**: Higher voltage yields shorter electron wavelength and better resolution, but may increase sample damage.
 
-### Cs3 (三级球差)
+### Cs3 (Third-order Spherical Aberration)
 
-**单位**: mm (毫米)
+**Unit**: mm
 
-**说明**: 球差系数的三级分量，是主要的像差之一。
+**Description**: Third-order spherical aberration coefficient, one of the primary aberration terms.
 
-**典型值**:
-- 球差校正器未启用: 0.5 - 3.0 mm
-- 球差校正器启用: < 0.1 mm
-- 现代 TEM: 通常 < 1.0 mm
+**Typical values**:
+- Without Cs corrector: 0.5 - 3.0 mm
+- With Cs corrector: < 0.1 mm
+- Modern TEM: typically < 1.0 mm
 
-**影响**: Cs 越大，分辨率越低。球差校正可以显著改善分辨率。
+**Effect**: Larger Cs reduces resolution. Cs correction significantly improves resolution.
 
-### Cs5 (五级球差)
+### Cs5 (Fifth-order Spherical Aberration)
 
-**单位**: mm (毫米)
+**Unit**: mm
 
-**说明**: 球差系数的五级分量，通常比 Cs3 小得多。
+**Description**: Fifth-order spherical aberration coefficient, typically much smaller than Cs3.
 
-**典型值**: 0.0 - 0.5 mm
+**Typical values**: 0.0 - 0.5 mm
 
-**影响**: 主要影响高角度散射，对大多数图像可以设为 0。
+**Effect**: Mainly affects high-angle scattering; can be set to 0 for most images.
 
-### Defocus (离焦量)
+### Defocus
 
-**单位**: nm (纳米)
+**Unit**: nm
 
-**说明**: 物镜的离焦距离，正值表示过焦，负值表示欠焦。
+**Description**: Objective lens defocus distance. Positive values indicate overfocus, negative values indicate underfocus.
 
-**典型值**:
-- 欠焦: -10 ~ -100 nm（最常用）
-- 过焦: +10 ~ +100 nm
-- 薛氏调焦: 略正的值（用于相位衬度）
+**Typical values**:
+- Underfocus: -10 to -100 nm (most common)
+- Overfocus: +10 to +100 nm
+- Scherzer focus: Slightly positive (for phase contrast)
 
-**影响**:
-- 欠焦时，衬度增强，但可能有假频
-- 过焦时，图像模糊
-- 离焦过大会导致 CTF 振荡
+**Effect**:
+- Underfocus enhances contrast but may introduce artifacts
+- Overfocus blurs the image
+- Excessive defocus causes CTF oscillations
 
-**设置建议**: 使用图像的傅里叶变换观察 CTF，选择 CTF 第一个零点位置合适的离焦量。
+**Recommendation**: Use the Fourier transform of the image to observe the CTF and choose a defocus where the first CTF zero is at a reasonable position.
 
-### Objective Aperture (物镜光阑)
+### Objective Aperture
 
-**单位**: mrad (毫弧度)
+**Unit**: mrad
 
-**说明**: 物镜光阑的收集角度，决定了探针的半角。
+**Description**: The collection angle of the objective aperture, determining the semi-angle of the probe.
 
-**典型值**:
-- 8 - 12 mrad: 低角度，高穿透
-- 12 - 20 mrad: 标准设置（常用）
-- 20 - 30 mrad: 高角度，高分辨率
+**Typical values**:
+- 8 - 12 mrad: Low angle, high penetration
+- 12 - 20 mrad: Standard setting (common)
+- 20 - 30 mrad: High angle, high resolution
 
-**影响**:
-- 角度越大，探针越小，分辨率越高
-- 但高角度会导致探针拖尾，增加计算复杂度
+**Effect**:
+- Larger aperture yields smaller probe and better resolution
+- However, high angles may cause probe tailing and increase computational complexity
 
-### Pixel Size (像素尺寸)
+### Pixel Size
 
-**单位**: nm (纳米)
+**Unit**: nm
 
-**说明**: 图像像素对应的实际物理尺寸，通常从 MRC 文件元数据自动读取。
+**Description**: The physical size corresponding to each image pixel, typically read automatically from MRC file metadata.
 
-**计算方法**:
+**Calculation**:
 ```
 Pixel Size = Camera Pixel Size × Magnification / 1000
 ```
 
-**影响**: 像素尺寸越小，数字分辨率越高，但数据量也越大。
+**Effect**: Smaller pixel size gives higher digital resolution but larger data volume.
 
-## 解卷积参数
+## Deconvolution Parameters
 
-### Iterations (迭代次数)
+### Iterations
 
-**范围**: 1 - 100
+**Range**: 1 - 100
 
-**说明**: 解卷积算法的迭代次数。
+**Description**: Number of deconvolution algorithm iterations.
 
-**推荐值**:
-- 快速预览: 5 - 10 次
-- 标准处理: 15 - 30 次
-- 高质量: 30 - 50 次
-- 不建议超过 100 次
+**Recommended values**:
+- Quick preview: 5 - 10 iterations
+- Standard processing: 15 - 30 iterations
+- High quality: 30 - 50 iterations
+- Not recommended beyond 100 iterations
 
-**影响**:
-- 迭代太少: 解卷积不充分，模糊
-- 迭代太多: 噪声放大，可能出现伪影
+**Effect**:
+- Too few iterations: insufficient deconvolution, blurry result
+- Too many iterations: noise amplification, possible artifacts
 
-**选择建议**:
-1. 从 10 次开始
-2. 观察结果
-3. 逐步增加，找到最佳平衡点
+**Selection guide**:
+1. Start with 10 iterations
+2. Observe the result
+3. Gradually increase to find the optimal balance
 
-### Lambda (RL 正则化参数)
+### Lambda (RL Regularization Parameter)
 
-**范围**: 0.0001 - 1.0
+**Range**: 0.0001 - 1.0
 
-**说明**: Richardson-Lucy 算法的正则化参数，控制图像平滑程度。
+**Description**: Regularization parameter for the Richardson-Lucy algorithm, controlling image smoothness.
 
-**推荐值**:
-- 0.001 - 0.01: 锐利图像，可能有噪声
-- 0.01 - 0.05: 平衡设置（常用）
-- 0.05 - 0.1: 平滑图像，噪声少
+**Recommended values**:
+- 0.001 - 0.01: Sharp image, may have noise
+- 0.01 - 0.05: Balanced setting (common)
+- 0.05 - 0.1: Smooth image, less noise
 
-**影响**:
-- λ 小: 图像锐利，但噪声放大
-- λ 大: 图像平滑，但细节丢失
+**Effect**:
+- Small λ: Sharp image but noise amplification
+- Large λ: Smooth image but detail loss
 
-**选择建议**:
-- 高信噪比图像: λ = 0.001 - 0.01
-- 低信噪比图像: λ = 0.01 - 0.1
-- 可以通过尝试不同值找到最佳值
+**Selection guide**:
+- High SNR images: λ = 0.001 - 0.01
+- Low SNR images: λ = 0.01 - 0.1
+- Try different values to find the optimum
 
-### Lambda (FISTA 正则化参数)
+### Lambda (FISTA Regularization Parameter)
 
-**范围**: 0.0001 - 1.0
+**Range**: 0.0001 - 1.0
 
-**说明**: FISTA 算法的 L1 正则化参数。
+**Description**: L1 regularization parameter for the FISTA algorithm.
 
-**推荐值**: 0.005 - 0.05
+**Recommended values**: 0.005 - 0.05
 
-**影响**: 类似 RL 的 λ，但 FISTA 使用 L1 正则化，更适合稀疏数据。
+**Effect**: Similar to RL λ, but FISTA uses L1 regularization, better suited for sparse data.
 
-### Regularization Type (正则化类型)
+### Regularization Type
 
-**选项**:
-- **TV (Total Variation)**: 全变分正则化
-  - 优点: 保持边缘清晰
-  - 缺点: 可能产生块状伪影
-  - 适用: 边缘清晰的图像
-- **L2 (L2 范数)**: 平滑正则化
-  - 优点: 平滑自然
-  - 缺点: 可能模糊边缘
-  - 适用: 噪声较多的图像
+**Options**:
+- **TV (Total Variation)**: Total variation regularization
+  - Advantage: Preserves sharp edges
+  - Disadvantage: May produce blocky artifacts
+  - Suitable for: Images with sharp edges
+- **L2 (L2 Norm)**: Smooth regularization
+  - Advantage: Naturally smooth
+  - Disadvantage: May blur edges
+  - Suitable for: Noise-dominated images
 
-**选择建议**:
-- 默认使用 TV，如果出现块状伪影则尝试 L2。
+**Recommendation**: Use TV by default; switch to L2 if blocky artifacts appear.
 
-### Boundary Handling (边界处理)
+### Boundary Handling
 
-**选项**: True / False
+**Options**: True / False
 
-**说明**: 是否处理图像边界以减少伪影。
+**Description**: Whether to process image boundaries to reduce artifacts.
 
-**推荐**: **True** (始终开启)
+**Recommendation**: **True** (always enable)
 
-**影响**:
-- True: 边界伪影减少，计算量略增
-- False: 边界可能有环形伪影，计算更快
+**Effect**:
+- True: Reduced boundary artifacts, slightly more computation
+- False: Possible ring artifacts at boundaries, faster computation
 
-## 高级像差参数
+## Advanced Aberration Parameters
 
-这些参数通常用于高分辨率成像，一般图像可以设为 0。
+These parameters are typically used for high-resolution imaging and can be set to 0 for general images.
 
-### A2 Aberration (二级像差)
-
-**Amplitude**: nm
-**Angle**: rad (弧度)
-
-说明: 二级像差，包括像散等。
-
-### A3 Aberration (三级像差)
+### A2 Aberration (Second-order)
 
 **Amplitude**: nm
-**Angle**: rad (弧度)
+**Angle**: rad
 
-说明: 三级像差，包括彗差等。
+Description: Second-order aberration, including astigmatism, etc.
+
+### A3 Aberration (Third-order)
+
+**Amplitude**: nm
+**Angle**: rad
+
+Description: Third-order aberration, including coma, etc.
 
 ### B2 Aberration
 
 **Amplitude**: nm
-**Angle**: rad (弧度)
+**Angle**: rad
 
-说明: 特定的像差分量。
+Description: Specific aberration component.
 
-### Focal Spread (焦散)
+### Focal Spread
 
-**单位**: nm
+**Unit**: nm
 
-**说明**: 焦点的统计分布宽度，用于部分相干性建模。
+**Description**: Statistical distribution width of the focal point, used for partial coherence modeling.
 
-**典型值**: 2 - 10 nm
+**Typical values**: 2 - 10 nm
 
-### Convergence Angle (收敛角)
+### Convergence Angle
 
-**单位**: rad (弧度)
+**Unit**: rad
 
-**说明**: 电子束的收敛角。
+**Description**: Convergence angle of the electron beam.
 
-**典型值**: 0.005 - 0.02 rad
+**Typical values**: 0.005 - 0.02 rad
 
-## 后处理参数
+## Post-Processing Parameters
 
-### Apply Wiener Filter (应用维纳滤波)
+### Apply Wiener Filter
 
-**选项**: True / False
+**Options**: True / False
 
-**说明**: 应用维纳滤波抑制高频噪声。
+**Description**: Apply Wiener filtering to suppress high-frequency noise.
 
-**推荐**: **True** (推荐开启)
+**Recommendation**: **True** (recommended)
 
-**影响**:
-- True: 噪声减少，信噪比提高
-- False: 保持原始解卷积结果
+**Effect**:
+- True: Reduced noise, improved SNR
+- False: Preserves raw deconvolution result
 
-### Use P-spline Filter (使用 P-样条滤波)
+### Use P-spline Filter
 
-**选项**: True / False
+**Options**: True / False
 
-**说明**: 使用 P-样条滤波替代传统径向维纳滤波。
+**Description**: Use P-spline filtering as an alternative to traditional radial Wiener filtering.
 
-**推荐**: False (除非需要特殊频率响应)
+**Recommendation**: False (unless specific frequency response is needed)
 
-**区别**:
-- 径向维纳: 径向对称，简单快速
-- P-样条: 可以控制不同方向的频率响应，更灵活
+**Difference**:
+- Radial Wiener: Radially symmetric, simple and fast
+- P-spline: Directional frequency response control, more flexible
 
-### P-spline Lambda (P-样条平滑参数)
+### P-spline Lambda
 
-**范围**: 1 - 10000
+**Range**: 1 - 10000
 
-**说明**: P-样条滤波的平滑强度。
+**Description**: Smoothing strength for the P-spline filter.
 
-**推荐值**: 100 - 1000
+**Recommended values**: 100 - 1000
 
-**影响**:
-- 小值: 平滑较弱
-- 大值: 平滑较强
+**Effect**:
+- Small value: Weaker smoothing
+- Large value: Stronger smoothing
 
-### Information Limit (信息截止频率)
+### Information Limit
 
-**单位**: 1/nm 或 1/Å (空间频率)
+**Unit**: 1/nm or 1/Å (spatial frequency)
 
-**说明**: 显微镜的信息极限频率，高于此频率的信息被滤除。
+**Description**: The information limit frequency of the microscope; frequencies above this are filtered out.
 
-**选项**: "Auto" 或 具体数值
+**Options**: "Auto" or a specific value
 
-**推荐**: **Auto** (自动估计)
+**Recommendation**: **Auto** (automatic estimation)
 
-**自动估计**: 基于探针的振幅谱自动确定截止频率。
+**Auto-estimation**: Automatically determines the cutoff frequency based on the probe's amplitude spectrum.
 
-## 显示参数
+## Display Parameters
 
-### Space (空间域)
+### Space
 
-**选项**:
-- **Real Space**: 实空间图像
-- **Frequency Space**: 傅里叶空间（频域）
+**Options**:
+- **Real Space**: Real-space image display
+- **Frequency Space**: Fourier space (frequency domain) display
 
-**说明**: 切换图像显示的空间域。
+**Description**: Toggle between spatial domains for image display.
 
-**用途**:
-- 实空间: 观察图像结构和细节
-- 频域: 观察 CTF、探针形状、频率成分
+**Usage**:
+- Real space: Observe image structure and details
+- Frequency domain: Observe CTF, probe shape, frequency components
 
-### Mode (显示模式)
+### Mode (Display Mode)
 
-**选项**:
-- **Linear**: 线性显示（原始数据）
-- **Power**: 功率谱（振幅的平方）
-- **Log**: 对数显示（动态范围压缩）
+**Options**:
+- **Linear**: Linear display (raw data)
+- **Power**: Power spectrum (amplitude squared)
+- **Log**: Logarithmic display (dynamic range compression)
 
-**说明**: 控制图像的显示方式。
+**Description**: Controls the image display mode.
 
-**用途**:
-- Linear: 适合实空间图像
-- Power: 适合频域分析
-- Log: 适合同时显示高低频信息
+**Usage**:
+- Linear: Suitable for real-space images
+- Power: Suitable for frequency-domain analysis
+- Log: Suitable for displaying both high and low frequency information simultaneously
 
-### Colormap (色彩映射)
+### Colormap
 
-**选项**: gray, viridis, plasma, inferno, magma, jet, hot, cool
+**Options**: gray, viridis, plasma, inferno, magma, jet, hot, cool
 
-**说明**: 选择图像的颜色映射方案。
+**Description**: Select the color mapping scheme for images.
 
-**推荐**:
-- gray: 科学分析（黑白，客观）
-- viridis: 感知均匀，适合所有人
-- plasma/inferno/magma: 颜色丰富，适合展示
-- jet: 传统的温度图（不推荐用于分析）
+**Recommendation**:
+- gray: Scientific analysis (monochrome, objective)
+- viridis: Perceptually uniform, suitable for all audiences
+- plasma/inferno/magma: Rich colors, suitable for presentations
+- jet: Traditional heat map (not recommended for analysis)
 
-## 参数推荐值
+## Recommended Parameter Values
 
-### 300 kV 显微镜（常用设置）
+### 300 kV Microscope (Common Configuration)
 
 ```
-Voltage:      300 kV
-Cs3:          0.5 mm
-Cs5:          0.0 mm
-Defocus:     -44 nm
-Obj. Aperture: 16 mrad
-Pixel Size:   0.05 - 0.2 nm
+Voltage:        300 kV
+Cs3:            0.5 mm
+Cs5:            0.0 mm
+Defocus:       -44 nm
+Obj. Aperture:  16 mrad
+Pixel Size:     0.05 - 0.2 nm
 
 Iterations:     15 - 25
 Lambda (RL):    0.002 - 0.005
@@ -329,15 +330,15 @@ P-spline:       False
 Info Limit:     Auto
 ```
 
-### 200 kV 显微镜
+### 200 kV Microscope
 
 ```
-Voltage:      200 kV
-Cs3:          1.0 mm
-Cs5:          0.0 mm
-Defocus:     -50 nm
-Obj. Aperture: 15 mrad
-Pixel Size:   0.05 - 0.2 nm
+Voltage:        200 kV
+Cs3:            1.0 mm
+Cs5:            0.0 mm
+Defocus:       -50 nm
+Obj. Aperture:  15 mrad
+Pixel Size:     0.05 - 0.2 nm
 
 Iterations:     20 - 30
 Lambda (RL):    0.003 - 0.008
@@ -345,110 +346,110 @@ Reg. Type:      TV
 Boundary:       True
 ```
 
-### 低信噪比图像
+### Low SNR Images
 
 ```
-Iterations:     10 - 15 (避免噪声放大)
-Lambda (RL):    0.01 - 0.05 (强正则化)
-Reg. Type:      L2 (更平滑)
-Wiener:         True (后处理降噪)
+Iterations:     10 - 15 (avoid noise amplification)
+Lambda (RL):    0.01 - 0.05 (strong regularization)
+Reg. Type:      L2 (smoother)
+Wiener:         True (post-processing denoising)
 ```
 
-### 高信噪比图像
+### High SNR Images
 
 ```
-Iterations:     25 - 40 (充分利用数据)
-Lambda (RL):    0.001 - 0.005 (弱正则化)
-Reg. Type:      TV (保持边缘)
-Wiener:         False (保持细节)
+Iterations:     25 - 40 (fully leverage data)
+Lambda (RL):    0.001 - 0.005 (weak regularization)
+Reg. Type:      TV (edge preservation)
+Wiener:         False (preserve detail)
 ```
 
-## 参数调优策略
+## Parameter Tuning Strategy
 
-### 步骤 1: 确定 CTF 参数
+### Step 1: Determine CTF Parameters
 
-1. 在频域查看原始图像
-2. 观察 CTF 振荡
-3. 调整 Defocus，使第一个零点位置合理
+1. View the raw image in the frequency domain
+2. Observe CTF oscillations
+3. Adjust Defocus so the first zero is at a reasonable position
 
-### 步骤 2: 设置基本解卷积参数
+### Step 2: Set Basic Deconvolution Parameters
 
 1. Iterations = 15
 2. Lambda = 0.002
 3. Reg. Type = TV
 4. Boundary = True
 
-### 步骤 3: 迭代优化
+### Step 3: Iterative Optimization
 
-1. 查看解卷积结果
-2. 如果模糊: 增加迭代次数
-3. 如果噪声多: 减小迭代次数或增大 λ
+1. Examine the deconvolution result
+2. If blurry: Increase iterations
+3. If noisy: Decrease iterations or increase λ
 
-### 步骤 4: 细节调整
+### Step 4: Fine Tuning
 
-1. 如果边缘伪影: 切换到 L2 正则化
-2. 如果块状伪影: 切换到 L2 或增大 λ
-3. 如果高频噪声: 开启维纳滤波
+1. If edge artifacts appear: Switch to L2 regularization
+2. If blocky artifacts appear: Switch to L2 or increase λ
+3. If high-frequency noise is present: Enable Wiener filtering
 
-## 故障排除
+## Troubleshooting
 
-### 问题: 结果仍然模糊
+### Issue: Result is still blurry
 
-**可能原因**:
-- 迭代次数太少
-- λ 太大
-- CTF 参数不正确
+**Possible causes**:
+- Too few iterations
+- λ too large
+- Incorrect CTF parameters
 
-**解决**:
-- 增加迭代次数到 30-50
-- 减小 λ 到 0.001-0.002
-- 检查 Voltage, Cs3, Defocus 是否正确
+**Solutions**:
+- Increase iterations to 30-50
+- Decrease λ to 0.001-0.002
+- Verify Voltage, Cs3, and Defocus values
 
-### 问题: 噪声明显
+### Issue: Visible noise
 
-**可能原因**:
-- 迭代次数太多
-- λ 太小
-- 输入图像噪声多
+**Possible causes**:
+- Too many iterations
+- λ too small
+- Noisy input image
 
-**解决**:
-- 减小迭代次数到 10-15
-- 增大 λ 到 0.01-0.05
-- 启用维纳滤波后处理
-- 使用 L2 正则化
+**Solutions**:
+- Reduce iterations to 10-15
+- Increase λ to 0.01-0.05
+- Enable Wiener post-filtering
+- Use L2 regularization
 
-### 问题: 出现环形伪影
+### Issue: Ring artifacts
 
-**可能原因**:
-- CTF 参数错误
-- 未启用边界处理
+**Possible causes**:
+- Incorrect CTF parameters
+- Boundary handling disabled
 
-**解决**:
-- 检查并修正 Defocus 值
-- 确保 Boundary Handling = True
+**Solutions**:
+- Check and correct the Defocus value
+- Ensure Boundary Handling = True
 
-### 问题: 边缘有块状纹理
+### Issue: Blocky texture near edges
 
-**可能原因**:
-- TV 正则化过于强烈
+**Possible causes**:
+- TV regularization too strong
 
-**解决**:
-- 切换到 L2 正则化
-- 或减小 TV 的 λ
+**Solutions**:
+- Switch to L2 regularization
+- Or decrease the TV λ value
 
-### 问题: 频域图像异常
+### Issue: Abnormal frequency-domain image
 
-**可能原因**:
-- Pixel Size 不正确
+**Possible causes**:
+- Incorrect Pixel Size
 
-**解决**:
-- 检查 MRC 文件元数据
-- 手动设置正确的 Pixel Size
+**Solutions**:
+- Check MRC file metadata
+- Manually set the correct Pixel Size
 
-## 参考资料
+## References
 
-- HAADF-STEM 成像原理
-- 解卷积算法原理
-- 显微镜参数手册
+- HAADF-STEM imaging principles
+- Deconvolution algorithm theory
+- Electron microscope parameter manuals
 
-如有更多问题，请参考 [README.md](README.md) 或提交 [Issue](https://github.com/chenguisen/dec_stem_for_computer/issues)。
+For more information, refer to [README.md](README.md) or submit an [Issue](https://github.com/chenguisen/deconvolution-stem/issues).

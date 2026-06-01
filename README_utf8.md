@@ -49,8 +49,8 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/chenguisen/dec_stem_for_computer.git
-cd dec_stem_for_computer
+git clone https://github.com/chenguisen/deconvolution-stem.git
+cd deconvolution-stem
 ```
 
 ### 2. 创建虚拟环境（推荐）
@@ -200,7 +200,7 @@ python compare_results.py
 ## 文件结构
 
 ```
-dec_stem_for_computer/
+deconvolution-stem/
 ├── deconvolution_gui.py      # GUI 主程序
 ├── run_deconv.py            # 命令行工具
 ├── compare_results.py        # 结果对比工具
@@ -249,7 +249,7 @@ Academic Use License
 ## 联系方式
 
 如有问题或建议，请通过以下方式联系：
-- GitHub Issues: https://github.com/chenguisen/dec_stem_for_computer/issues
+- GitHub Issues: https://github.com/chenguisen/deconvolution-stem/issues
 
 ## 致谢
 

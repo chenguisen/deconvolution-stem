@@ -277,8 +277,8 @@ A: 可以，关闭自动创建文件夹功能，手动指定固定路径。
 ### 技术支持
 
 如遇问题，请访问:
-- GitHub: https://github.com/chenguisen/dec_stem_for_computer
-- Issues: https://github.com/chenguisen/dec_stem_for_computer/issues
+- GitHub: https://github.com/chenguisen/deconvolution-stem
+- Issues: https://github.com/chenguisen/deconvolution-stem/issues
 
 ---
 

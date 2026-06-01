@@ -107,7 +107,7 @@ python build_windows.py
 #### 预期输出
 
 ```
-dec_stem_for_computer/
+deconvolution-stem/
 ├── build_windows/          # PyInstaller 构建临时文件
 ├── dist_windows/             # 最终输出目录
 │   ├── HAADF_STEM_Deconvolution/       # 应用程序文件夹
@@ -574,4 +574,4 @@ a = Analysis(
 
 ---
 
-如有问题，请访问 [GitHub Issues](https://github.com/chenguisen/dec_stem_for_computer/issues)。
+如有问题，请访问 [GitHub Issues](https://github.com/chenguisen/deconvolution-stem/issues)。

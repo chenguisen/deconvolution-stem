@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Minimal pipeline test for dec_stem_for_computer.
+"""Minimal pipeline test for deconvolution-stem.
 
 Verifies that all three deconvolution algorithms run successfully on synthetic data
 and produce valid outputs (correct shape, no NaN, not all-constant).
@@ -54,7 +54,7 @@ def check_result(result, name, check_nonneg=True):
 
 def main():
     print("=" * 60)
-    print("dec_stem_for_computer — Pipeline Test")
+    print("deconvolution-stem — Pipeline Test")
     print("=" * 60)
 
     # --- Setup ---

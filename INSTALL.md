@@ -1,60 +1,60 @@
-# 安装指南 (Installation Guide)
+# Installation Guide
 
-本指南详细说明如何在不同操作系统上安装 HAADF-STEM Deconvolution 工具。
+This guide provides detailed instructions for installing the HAADF-STEM Deconvolution toolkit on various operating systems.
 
-## 目录
+## Table of Contents
 
-- [系统要求](#系统要求)
-- [快速安装](#快速安装)
-- [详细安装](#详细安装)
+- [System Requirements](#system-requirements)
+- [Quick Install](#quick-install)
+- [Detailed Installation](#detailed-installation)
   - [Linux](#linux)
   - [macOS](#macos)
   - [Windows](#windows)
-- [依赖包说明](#依赖包说明)
-- [常见安装问题](#常见安装问题)
-- [开发环境配置](#开发环境配置)
+- [Dependencies](#dependencies)
+- [Troubleshooting](#troubleshooting)
+- [Development Setup](#development-setup)
 
-## 系统要求
+## System Requirements
 
-### 软件要求
+### Software
 
-- **Python**: 3.8 或更高版本（推荐 3.9 或 3.10）
-- **pip**: Python 包管理器（通常随 Python 一起安装）
-- **Git**: 用于克隆仓库（可选）
+- **Python**: 3.9 or later (3.10 or 3.11 recommended)
+- **pip**: Python package manager (included with Python)
+- **Git**: For cloning the repository (optional)
 
-### 硬件要求
+### Hardware
 
-- **内存**: 最小 4GB，推荐 8GB 或更多
-- **存储**: 至少 1GB 可用空间
-- **CPU**: 支持多核处理器（Numba 可自动使用多核加速）
+- **Memory**: Minimum 4 GB, 8 GB or more recommended
+- **Storage**: At least 1 GB free space
+- **CPU**: Multi-core processor supported (Numba auto-uses multi-core)
 
-### 支持的操作系统
+### Supported Operating Systems
 
-- Linux (Ubuntu, Fedora, CentOS, 等)
-- macOS (10.15 Catalina 及更高版本)
+- Linux (Ubuntu, Fedora, CentOS, etc.)
+- macOS (10.15 Catalina and later)
 - Windows 10/11
 
-## 快速安装
+## Quick Install
 
-如果您已经配置好 Python 环境，可以快速安装：
+If Python is already set up:
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/chenguisen/dec_stem_for_computer.git
-cd dec_stem_for_computer
+# 1. Clone the repository
+git clone https://github.com/chenguisen/deconvolution-stem.git
+cd deconvolution-stem
 
-# 2. 安装依赖
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. 运行程序
+# 3. Run the program
 python deconvolution_gui.py
 ```
 
-## 详细安装
+## Detailed Installation
 
 ### Linux
 
-#### 安装 Python
+#### Install Python
 
 **Ubuntu/Debian:**
 ```bash
@@ -72,9 +72,9 @@ sudo dnf install python3 python3-pip python3-venv
 sudo pacman -S python python-pip python-virtualenv
 ```
 
-#### 安装系统依赖
+#### Install system build dependencies
 
-某些包可能需要编译，需要安装构建工具：
+Some packages require compilation:
 
 ```bash
 # Ubuntu/Debian
@@ -88,230 +88,228 @@ sudo yum groupinstall "Development Tools"
 sudo yum install gfortran
 ```
 
-#### 创建虚拟环境并安装
+#### Create virtual environment and install
 
 ```bash
-# 克隆仓库
-git clone https://github.com/chenguisen/dec_stem_for_computer.git
-cd dec_stem_for_computer
+# Clone the repository
+git clone https://github.com/chenguisen/deconvolution-stem.git
+cd deconvolution-stem
 
-# 创建虚拟环境
+# Create virtual environment
 python3 -m venv venv
 
-# 激活虚拟环境
+# Activate virtual environment
 source venv/bin/activate
 
-# 升级 pip
+# Upgrade pip
 pip install --upgrade pip
 
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 
-# 运行程序
+# Run the program
 python deconvolution_gui.py
 ```
 
 ### macOS
 
-#### 安装 Python
+#### Install Python
 
-**推荐使用 Homebrew:**
+**Using Homebrew (recommended):**
 ```bash
-# 安装 Homebrew（如果未安装）
+# Install Homebrew if not already installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# 安装 Python
+# Install Python
 brew install python@3.10
 ```
 
-**或者使用官方安装包:**
-从 https://www.python.org/downloads/ 下载 macOS 安装包
+**Or download from official installer:**
+Download from https://www.python.org/downloads/
 
-#### 安装依赖
+#### Install dependencies
 
 ```bash
-# 克隆仓库
-git clone https://github.com/chenguisen/dec_stem_for_computer.git
-cd dec_stem_for_computer
+# Clone the repository
+git clone https://github.com/chenguisen/deconvolution-stem.git
+cd deconvolution-stem
 
-# 创建虚拟环境
+# Create virtual environment
 python3 -m venv venv
 
-# 激活虚拟环境
+# Activate virtual environment
 source venv/bin/activate
 
-# 升级 pip
+# Upgrade pip
 pip install --upgrade pip
 
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 
-# 运行程序
+# Run the program
 python deconvolution_gui.py
 ```
 
-#### 注意事项
+#### Notes
 
-- macOS 可能需要安装 Xcode 命令行工具：`xcode-select --install`
-- 如果遇到编译错误，确保已安装最新的 Xcode
+- macOS may require Xcode command-line tools: `xcode-select --install`
+- If compilation errors occur, ensure Xcode is up to date
 
 ### Windows
 
-#### 安装 Python
+#### Install Python
 
-1. 访问 https://www.python.org/downloads/
-2. 下载 Python 3.9 或 3.10 的 Windows 安装包
-3. 运行安装程序，**重要：勾选 "Add Python to PATH"**
-4. 完成安装
+1. Visit https://www.python.org/downloads/
+2. Download Python 3.9, 3.10, or 3.11 installer
+3. Run the installer — **Important: check "Add Python to PATH"**
+4. Complete installation
 
-#### 安装 Visual C++ 编译工具（可选）
+#### Install Visual C++ Build Tools (optional)
 
-某些 Python 包需要编译，建议安装：
+Some packages require compilation:
 
 ```powershell
-# 以管理员身份运行 PowerShell，执行：
+# Run PowerShell as Administrator:
 winget install Microsoft.VisualStudio.2022.BuildTools
-# 或下载安装: https://visualstudio.microsoft.com/downloads/
 ```
 
-#### 使用 Git 克隆（可选）
+#### Clone or download the repository
 
-**方法 1: 使用 Git 命令行**
+**Using Git:**
 ```powershell
-# 安装 Git: https://git-scm.com/download/win
-git clone https://github.com/chenguisen/dec_stem_for_computer.git
-cd dec_stem_for_computer
+git clone https://github.com/chenguisen/deconvolution-stem.git
+cd deconvolution-stem
 ```
 
-**方法 2: 直接下载**
-1. 访问 https://github.com/chenguisen/dec_stem_for_computer
-2. 点击 "Code" -> "Download ZIP"
-3. 解压缩到本地目录
+**Or download ZIP:**
+1. Visit https://github.com/chenguisen/deconvolution-stem
+2. Click "Code" → "Download ZIP"
+3. Extract to a local directory
 
-#### 创建虚拟环境并安装
+#### Create virtual environment and install
 
 ```powershell
-# 打开命令提示符或 PowerShell，进入项目目录
-cd dec_stem_for_computer
+# Open Command Prompt or PowerShell, enter the project directory
+cd deconvolution-stem
 
-# 创建虚拟环境
+# Create virtual environment
 python -m venv venv
 
-# 激活虚拟环境
+# Activate virtual environment
 # PowerShell:
 venv\Scripts\Activate.ps1
-# 或命令提示符:
+# or Command Prompt:
 venv\Scripts\activate.bat
 
-# 升级 pip
+# Upgrade pip
 python -m pip install --upgrade pip
 
-# 安装依赖
+# Install dependencies
 pip install -r requirements.txt
 
-# 运行程序
+# Run the program
 python deconvolution_gui.py
 ```
 
-#### Windows PowerShell 执行策略问题
+#### Windows PowerShell execution policy
 
-如果遇到 "execution of scripts is disabled" 错误：
+If you see "execution of scripts is disabled":
 
 ```powershell
-# 以管理员身份运行 PowerShell，执行：
+# Run PowerShell as Administrator:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-## 依赖包说明
+## Dependencies
 
-### 必需包
+### Required
 
-| 包名 | 用途 | 依赖 |
-|------|------|------|
-| PyQt6 | 图形界面框架 | 无 |
-| numpy | 数值计算 | 无 |
-| scipy | 科学计算 | numpy |
-| matplotlib | 数据可视化 | numpy |
-| mrcfile | MRC 文件读写 | numpy |
+| Package | Purpose | Dependencies |
+|---------|---------|--------------|
+| PyQt6 | GUI framework | None |
+| numpy | Numerical computing | None |
+| scipy | Scientific computing | numpy |
+| matplotlib | Data visualization | numpy |
+| mrcfile | MRC file I/O | numpy |
 
-### 可选包
+### Optional
 
-| 包名 | 用途 | 说明 |
-|------|------|------|
-| numba | 性能加速 | 使用 JIT 编译，大幅提升计算速度 |
-| scikit-image | 图像处理 | 提供额外的图像处理算法 |
-| tqdm | 进度显示 | 命令行工具的进度条 |
+| Package | Purpose | Notes |
+|---------|---------|-------|
+| numba | Performance acceleration | JIT compilation, significantly speeds up computation |
+| scikit-image | Image processing | Additional image processing algorithms |
+| tqdm | Progress bar | Terminal progress display for CLI tools |
 
-### 最小安装
+### Minimal Installation
 
-如果只需要基本功能，可以只安装必需包：
+For basic functionality only:
 
 ```bash
 pip install PyQt6 numpy scipy matplotlib mrcfile
 ```
 
-## 常见安装问题
+## Troubleshooting
 
-### 问题 1: pip 版本过旧
+### Issue 1: Old pip version
 
-**错误信息**: `WARNING: You are using pip version X, however version Y is available.`
+**Error**: `WARNING: You are using pip version X, however version Y is available.`
 
-**解决方案**:
+**Solution**:
 ```bash
 python -m pip install --upgrade pip
 ```
 
-### 问题 2: 权限错误
+### Issue 2: Permission errors
 
-**错误信息**: `Permission denied` 或 `Access denied`
+**Error**: `Permission denied` or `Access denied`
 
-**解决方案**:
-- Linux/macOS: 在命令前加 `sudo`（不推荐）
-- 更好的方法：使用虚拟环境（推荐）
+**Solution**:
+- On Linux/macOS: Use a virtual environment (recommended) instead of `sudo`
+- On Windows: Run terminal as Administrator
 
-### 问题 3: 编译错误
+### Issue 3: Compilation errors
 
-**错误信息**: `Microsoft Visual C++ 14.0 is required` 或类似错误
+**Error**: `Microsoft Visual C++ 14.0 is required` or similar
 
-**解决方案**:
-- Windows: 安装 Visual C++ Build Tools
-- Linux: 安装 `build-essential` 和 `gfortran`
-- macOS: 安装 Xcode 命令行工具
+**Solution**:
+- Windows: Install Visual C++ Build Tools
+- Linux: Install `build-essential` and `gfortran`
+- macOS: Install Xcode command-line tools
 
-### 问题 4: PyQt6 安装失败
+### Issue 4: PyQt6 installation fails
 
-**解决方案**:
+**Solution**:
 ```bash
-# 尝试使用预编译的 wheel 包
+# Try pre-built wheels
 pip install PyQt6 --prefer-binary
 
-# 如果仍失败，使用 conda
+# Or use conda as alternative
 conda install pyqt
 ```
 
-### 问题 5: numpy/scipy 版本冲突
+### Issue 5: numpy/scipy version conflicts
 
-**解决方案**:
+**Solution**:
 ```bash
-# 清理旧版本
+# Clean old versions
 pip uninstall numpy scipy
 
-# 重新安装
+# Reinstall
 pip install numpy scipy
 ```
 
-### 问题 6: mrcfile 导入错误
+### Issue 6: mrcfile import error
 
-**错误信息**: `ImportError: No module named 'mrcfile'`
+**Error**: `ImportError: No module named 'mrcfile'`
 
-**解决方案**:
+**Solution**:
 ```bash
 pip install mrcfile
 ```
 
-### 问题 7: 虚拟环境激活失败
+### Issue 7: Virtual environment activation fails
 
-**Linux/macOS**: 确保安装了 `python3-venv`
+**Linux/macOS**: Ensure `python3-venv` is installed
 ```bash
 # Ubuntu/Debian
 sudo apt install python3-venv
@@ -320,7 +318,7 @@ sudo apt install python3-venv
 sudo dnf install python3-virtualenv
 ```
 
-**Windows**: 确保使用正确的激活脚本
+**Windows**: Use the correct activation script
 ```powershell
 # PowerShell
 venv\Scripts\Activate.ps1
@@ -329,93 +327,82 @@ venv\Scripts\Activate.ps1
 venv\Scripts\activate.bat
 ```
 
-## 开发环境配置
+## Development Setup
 
-### 安装开发工具
+### Install development tools
 
 ```bash
-# 激活虚拟环境后，安装开发依赖
+# Activate virtual environment first, then:
 pip install pytest pylint black flake8 mypy
-
-# 或者创建 requirements-dev.txt
-cat > requirements-dev.txt << EOF
-pytest>=7.0.0
-pylint>=2.13.0
-black>=22.0.0
-flake8>=4.0.0
-mypy>=0.940
-EOF
-
-pip install -r requirements-dev.txt
 ```
 
-### 运行测试
+### Run tests
 
 ```bash
-# 运行所有测试
+# Run all tests
 pytest
 
-# 运行特定测试
-pytest test_deconv.py
+# Run specific test
+pytest tests/test_pipeline.py
 
-# 生成覆盖率报告
+# Generate coverage report
 pytest --cov=stem_deconv --cov-report=html
 ```
 
-### 代码格式化
+### Code formatting
 
 ```bash
-# 使用 Black 格式化代码
+# Format with Black
 black stem_deconv/ *.py
 
-# 使用 Pylint 检查代码质量
+# Check quality with Pylint
 pylint stem_deconv/
 ```
 
-## 验证安装
+## Verify Installation
 
-安装完成后，运行以下命令验证：
+Run the following to verify:
 
 ```bash
-# 检查 Python 版本
+# Check Python version
 python --version
 
-# 检查已安装的包
-pip list
-
-# 测试导入
+# Test imports
 python -c "import numpy, scipy, matplotlib, PyQt6; print('All imports successful!')"
 
-# 运行 GUI
+# Launch GUI
 python deconvolution_gui.py
 ```
 
-如果 GUI 正常启动，说明安装成功！
+If the GUI starts successfully, installation is complete!
 
-## 卸载
+## Uninstallation
 
-### 卸载软件包
+### Uninstall packages
 
 ```bash
-# 卸载所有包
 pip uninstall -y PyQt6 numpy scipy matplotlib mrcfile numba scikit-image tqdm
-
-# 或者删除虚拟环境（推荐）
-deactivate  # 如果虚拟环境已激活
-rm -rf venv  # Linux/macOS
-rmdir /s venv  # Windows
 ```
 
-### 完全删除项目
+### Remove virtual environment
+
+```bash
+deactivate  # if activated
+rm -rf venv  # Linux/macOS
+# or on Windows:
+rmdir /s venv
+```
+
+### Delete project
 
 ```bash
 cd ..
-rm -rf dec_stem_for_computer  # Linux/macOS
-rmdir /s dec_stem_for_computer  # Windows
+rm -rf deconvolution-stem  # Linux/macOS
+rmdir /s deconvolution-stem  # Windows
 ```
 
-## 下一步
+## Next Steps
 
-安装完成后，请阅读 [README.md](README.md) 了解如何使用本工具。
+After installation, refer to [README.md](README.md) for usage instructions.
 
-如有问题，请访问 [GitHub Issues](https://github.com/chenguisen/dec_stem_for_computer/issues) 提交问题。
+For issues, please submit a report at [GitHub Issues](https://github.com/chenguisen/deconvolution-stem/issues).
